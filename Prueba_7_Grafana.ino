@@ -22,7 +22,7 @@ char thingsboardServer[] = "iotserver.cespi.unlp.edu.ar";//Entorno Online
 
 
 
-/*-----( Declare Variables )-----*/
+
 
 
 //Hardware pin definitions
