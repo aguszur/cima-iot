@@ -16,7 +16,7 @@
 #define WIFI_PASSWORD "benitomiguelete"
 #define WIFI_AP_BK "motogbk"
 #define WIFI_PASSWORD_BK "12345678"
-#define VERSION "v1.7.1"
+#define VERSION "v1.7.2"
 
 char thingsboardServer[] = "iotserver.cespi.unlp.edu.ar";//Broker MQTT
 
