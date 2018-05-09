@@ -21,6 +21,7 @@
 char thingsboardServer[] = "iotserver.cespi.unlp.edu.ar";//Broker MQTT
 
 //AGREGAMOS ANEMOMETRO
+//MEDIR TMP
 
 
 
