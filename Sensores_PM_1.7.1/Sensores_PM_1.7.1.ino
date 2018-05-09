@@ -20,12 +20,7 @@
 
 char thingsboardServer[] = "iotserver.cespi.unlp.edu.ar";//Broker MQTT
 
-<<<<<<< HEAD
-//AGREGAMOS ANEMOMETRO
-//MEDIR TMP
-=======
 
->>>>>>> parent of 72fcd60... Add anemometer
 
 
 
