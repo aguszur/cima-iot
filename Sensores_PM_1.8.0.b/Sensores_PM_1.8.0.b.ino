@@ -12,7 +12,7 @@
 
 
 #define DHTTYPE DHT22
-#define WIFI_AP "APLinti"
+#define WIFI_AP "APLinti2"
 #define WIFI_PASSWORD "bienvenidoalintigli"
 #define WIFI_AP_BK "motogbk"
 #define WIFI_PASSWORD_BK "12345678"
@@ -104,7 +104,7 @@ int windgustdir_10m = 0; // [0-360 past 10 minutes wind gust direction]
 float humidity = 0; // [%]
 float tempHTU = 0; // [temperature F]
 float pressure = 0;
-float light_lvl = 455; //[analog value from 0 to 1023]
+float light_lvl = 0; //[analog value from 0 to 1023]
 
 // volatiles are subject to modification by IRQs
 volatile unsigned long raintime, rainlast, raininterval, rain;
@@ -527,10 +527,10 @@ void MedirParticulas_SDS011()
 
             Pm25_sds011 = ((uint16_t)mPkt[2] | (uint16_t)(mPkt[3]<<8))/10;
             Pm10_sds011 = ((uint16_t)mPkt[4] | (uint16_t)(mPkt[5]<<8))/10;
-            if(Pm25_sds011 > 9999)
-             Pm25_sds011 = 9999;
-            if(Pm10_sds011 > 9999)
-             Pm10_sds011 = 9999;            
+            if(Pm25_sds011 > 999)
+             Pm25_sds011 = 999;
+            if(Pm10_sds011 > 999)
+             Pm10_sds011 = 999;            
             //get one good packet
              return;
              
@@ -607,8 +607,8 @@ void MedirParticulas_PPD42()
   
     duration = pulseIn(PM, LOW);
     lowpulseoccupancy += duration;
-    //Serial.print("LPO PPD42: ");
-   // Serial.println(lowpulseoccupancy);
+    Serial.print("LPO PPD42: ");
+    Serial.println(lowpulseoccupancy);
     endtime = millis();
     
     if ((endtime-starttime) > sampletime_ms)
@@ -758,17 +758,17 @@ void printWeather()
  delay(50);
  client.publish( "estacion_PM/humedad",dtostrf(humedadDHT,1,2,buf ));
  delay(100);
- client.publish( "estacion_PM/pm25_sds011",dtostrf(Pm25_sds011,1,0,buf ));
+ client.publish( "estacion_PM/pm25_sds011",dtostrf(Pm25_sds011,1,2,buf ));
  delay(100);
- client.publish( "estacion_PM/pm10_sds011",dtostrf(Pm10_sds011,1,0,buf ));
+ client.publish( "estacion_PM/pm10_sds011",dtostrf(Pm10_sds011,1,2,buf ));
  delay(100);
- client.publish( "estacion_PM/pm25_sds021",dtostrf(Pm25_sds021,1,0,buf ));
+ client.publish( "estacion_PM/pm25_sds021",dtostrf(Pm25_sds021,1,2,buf ));
  delay(100);
- client.publish( "estacion_PM/pm10_sds021",dtostrf(Pm10_sds021,1,0,buf ));
+ client.publish( "estacion_PM/pm10_sds021",dtostrf(Pm10_sds021,1,2,buf ));
  delay(100);
- client.publish( "estacion_PM/pm25_ppd42",dtostrf(Pm25_ppd42,1,0,buf ));
+ client.publish( "estacion_PM/pm25_ppd42",dtostrf(Pm25_ppd42,1,2,buf ));
  delay(100);
- client.publish( "estacion_PM/windir",dtostrf(winddir,1,0,buf ));
+/* client.publish( "estacion_PM/windir",dtostrf(winddir,1,0,buf ));
  delay(100);
  client.publish( "estacion_PM/winspeed",dtostrf(windspeedmph,1,0,buf ));
  delay(100);
