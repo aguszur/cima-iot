@@ -357,7 +357,7 @@ unsigned long intentosTh=millis();
 
 void calculoEM()
 {
-
+    char buf[10];
     /*//Calc windspdmph_avg2m  -  PROMEDIO WIN SPEED
     float temp = 0;
     for(int i = 0 ; i < WIND_AVG_SIZE ; i++)
@@ -366,6 +366,7 @@ void calculoEM()
     windspdmph_avg2m = temp;
     */
     windspeedmph = get_wind_speed();
+    client.publish( "estacion_PM/winspeed",dtostrf(windspeedmph,1,2,buf ));
         
      //Calc winddir_avg2m, Wind Direction
     //You can't just take the average. Google "mean of circular quantities" for more info
@@ -374,7 +375,7 @@ void calculoEM()
     //Based on: http://abelian.org/vlf/bearings.html
     //Based on: http://stackoverflow.com/questions/1813483/averaging-angles-again
     winddir = get_wind_direction();
-    
+    client.publish( "estacion_PM/windir",dtostrf(winddir,1,0,buf ));
     /*PROMEDIO WINDIR
     long sum = winddiravg[0];
     int D = winddiravg[0];
@@ -398,21 +399,22 @@ void calculoEM()
 
     //Calc humidity
     humidity = myHumidity.getRH();
-
-
+    client.publish( "estacion_PM/humedadHTU",dtostrf(humidity,1,2,buf ));
+ 
      //Calc tempf from pressure sensor
    //tempf = myPressure.readTempF();
     tempHTU = myPressure.readTemp(); //leemos en Celsius
+    client.publish( "estacion_PM/tempHTU",dtostrf(tempHTU,1,2,buf ));
 
 
     //Calc pressure
    // pressure = myPressure.readPressure();
       pressure = myPressure.readPressure()/100;//Pasamos a Hectopascales
-
-
+    client.publish( "estacion_PM/pressure",dtostrf(pressure,1,0,buf ));
+ 
       //Calc light level
       light_lvl = get_light_level();
-
+     client.publish( "estacion_PM/light",dtostrf(light_lvl,1,2,buf ));
 }
 
 
@@ -607,17 +609,19 @@ void MedirParticulas_PPD42()
   
     duration = pulseIn(PM, LOW);
     lowpulseoccupancy += duration;
-    Serial.print("LPO PPD42: ");
-    Serial.println(lowpulseoccupancy);
+   // Serial.print("LPO PPD42: ");
+   // Serial.println(lowpulseoccupancy);
     endtime = millis();
     
     if ((endtime-starttime) > sampletime_ms)
     {
     ratio = lowpulseoccupancy/(sampletime_ms*10.0);  // Integer percentage 0=>100
-    Pm25_ppd42= ratio * ratio * .1809 + 3.8987 * ratio + 2.5003;//Ver  https://airquality406.wordpress.com/calibration/  . Simil Colombia tambien.
+   // Pm25_ppd42= ratio * ratio * .1809 + 3.8987 * ratio + 2.5003;//Ver  https://airquality406.wordpress.com/calibration/  . Simil Colombia tambien.
+  // Pm25_ppd42=(1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62)/100; //Fuente ver http://www.takingspace.org/aircasting/airbeam/ Github: https://github.com/HabitatMap/AirCastingAndroidClient/blob/master/arduino/aircasting/aircasting_shinyeiPPD42NS.ino
+   Pm25_ppd42=1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // Utilizan menos tiempo de sampleo y no divide por 100. Ver https://github.com/HabitatMap/AirCastingAndroidClient/commit/a16e6cbae37c16a82121aaa02f55b04a114bccb1
     lowpulseoccupancy = 0;
-    Serial.print("PM25_PPD42:");  
-    Serial.println(Pm25_ppd42); 
+   // Serial.print("PM25_PPD42:");  
+   // Serial.println(Pm25_ppd42); 
     mido=0;
                
     }
@@ -626,40 +630,57 @@ void MedirParticulas_PPD42()
 
 void printWeather()
 {
-
+      char buf[10];
     //Medir Particulas PPD42
       MedirParticulas_PPD42();
-       
+      if(Pm25_ppd42 < 1000){
+      client.publish( "estacion_PM/pm25_ppd42",dtostrf(Pm25_ppd42,1,2,buf ));
+      }
+      
     //Medir Particulas SDS011
       MedirParticulas_SDS011();
+      if((Pm25_sds011 < 1000)&&(Pm10_sds011 < 1000)){
+      client.publish( "estacion_PM/pm25_sds011",dtostrf(Pm25_sds011,1,2,buf ));
+      delay(50);
+      client.publish( "estacion_PM/pm10_sds011",dtostrf(Pm10_sds011,1,2,buf ));
+      }
      
-      Serial.print("PM25_SDS011:  ");
-      Serial.println(Pm25_sds011);
-      Serial.print("PM10_SDS011:  ");
-      Serial.println(Pm10_sds011);
+  //    Serial.print("PM25_SDS011:  ");
+  //    Serial.println(Pm25_sds011);
+  //    Serial.print("PM10_SDS011:  ");
+  //    Serial.println(Pm10_sds011);
 
     //Medir Particulas SDS021
       MedirParticulas_SDS021();
+      if((Pm25_sds021 < 1000)&&(Pm10_sds021 < 1000)){
+      client.publish( "estacion_PM/pm25_sds021",dtostrf(Pm25_sds021,1,2,buf ));
+      delay(50);
+      client.publish( "estacion_PM/pm10_sds021",dtostrf(Pm10_sds021,1,2,buf ));
+      }
       
-      Serial.print("PM25_SDS021:  ");
-      Serial.println(Pm25_sds021);
-      Serial.print("PM10_SDS021:  ");
-      Serial.println(Pm10_sds021);
+   //   Serial.print("PM25_SDS021:  ");
+    //  Serial.println(Pm25_sds021);
+    //  Serial.print("PM10_SDS021:  ");
+    //  Serial.println(Pm10_sds021);
 
     
     //Calculamos la temperatura y humedad del DHT22
       humedadDHT = dht.readHumidity();
       tempDHT = dht.readTemperature();
-      Serial.print("Temperatura DHT22:  ");
-      Serial.println(tempDHT);  
-      Serial.print("Humedad DHT22:  ");
-      Serial.println(humedadDHT);
+      client.publish( "estacion_PM/temperatura",dtostrf(tempDHT,1,2,buf ));
+      delay(50);
+      client.publish( "estacion_PM/humedad",dtostrf(humedadDHT,1,2,buf ));
+  //    Serial.print("Temperatura DHT22:  ");
+  //    Serial.println(tempDHT);  
+  //    Serial.print("Humedad DHT22:  ");
+  //    Serial.println(humedadDHT);
 
     //Valores ETACION METEO
-    Serial.print("Direccion del viento:  ");
-    Serial.println(winddir);
-    Serial.print("Velocidad del viento km/h:  ");
-    Serial.println(windspeedmph, 1);
+   // Serial.print("Direccion del viento:  ");
+   // Serial.println(winddir);
+   // Serial.print("Velocidad del viento km/h:  ");
+  //  Serial.println(windspeedmph, 1);
+    
    // Serial.print("Velocidad de rafaga Maxima km/h:  ");
    //Serial.println(windgustmph, 1);
    // Serial.print("Direccion de la Rafaga maxima:  ");
@@ -672,16 +693,17 @@ void printWeather()
    // Serial.println(windgustmph_10m, 1);
    // Serial.print("Direccion de la Rafaga maxima Km/h - ult 10 min-:  ");
    // Serial.println(windgustdir_10m);
-    Serial.print("Humedad HTU21D on board:  ");
-    Serial.println(humidity, 1);
-    Serial.print("Temperatura HTU21D on board:  ");
-    Serial.println(tempHTU, 1);
+   
+  //  Serial.print("Humedad HTU21D on board:  ");
+  //  Serial.println(humidity, 1);
+  //  Serial.print("Temperatura HTU21D on board:  ");
+  //  Serial.println(tempHTU, 1);
    // Serial.print("Temperatura DS18B20 1-wire:  ");
    // Serial.println(sensors.getTempCByIndex(0),1);  
-    Serial.print("Presion hPa:  ");
-    Serial.println(pressure, 2);
-    Serial.print("Nivel de Luz:  ");
-    Serial.println(light_lvl, 2);
+  //  Serial.print("Presion hPa:  ");
+  //  Serial.println(pressure, 2);
+    //Serial.print("Nivel de Luz:  ");
+  //  Serial.println(light_lvl, 2);
 
 
     
@@ -753,32 +775,32 @@ void printWeather()
   lcd.print(VERSION);
    
   
- char buf[10];
- client.publish( "estacion_PM/temperatura",dtostrf(tempDHT,1,2,buf ));
- delay(50);
- client.publish( "estacion_PM/humedad",dtostrf(humedadDHT,1,2,buf ));
- delay(100);
- client.publish( "estacion_PM/pm25_sds011",dtostrf(Pm25_sds011,1,2,buf ));
- delay(100);
- client.publish( "estacion_PM/pm10_sds011",dtostrf(Pm10_sds011,1,2,buf ));
- delay(100);
- client.publish( "estacion_PM/pm25_sds021",dtostrf(Pm25_sds021,1,2,buf ));
- delay(100);
- client.publish( "estacion_PM/pm10_sds021",dtostrf(Pm10_sds021,1,2,buf ));
- delay(100);
- client.publish( "estacion_PM/pm25_ppd42",dtostrf(Pm25_ppd42,1,2,buf ));
- delay(100);
-/* client.publish( "estacion_PM/windir",dtostrf(winddir,1,0,buf ));
- delay(100);
- client.publish( "estacion_PM/winspeed",dtostrf(windspeedmph,1,0,buf ));
- delay(100);
- client.publish( "estacion_PM/humedadHTU",dtostrf(humidity,1,0,buf ));
- delay(100);
- client.publish( "estacion_PM/tempHTU",dtostrf(tempHTU,1,0,buf ));
- delay(100);
- client.publish( "estacion_PM/pressure",dtostrf(pressure,1,0,buf ));
- delay(100);
- client.publish( "estacion_PM/light",dtostrf(light_lvl,1,0,buf ));
+ 
+// client.publish( "estacion_PM/temperatura",dtostrf(tempDHT,1,2,buf ));
+// delay(50);
+// client.publish( "estacion_PM/humedad",dtostrf(humedadDHT,1,2,buf ));
+// delay(100);
+// client.publish( "estacion_PM/pm25_sds011",dtostrf(Pm25_sds011,1,2,buf ));
+// delay(100);
+// client.publish( "estacion_PM/pm10_sds011",dtostrf(Pm10_sds011,1,2,buf ));
+// delay(100);
+// client.publish( "estacion_PM/pm25_sds021",dtostrf(Pm25_sds021,1,2,buf ));
+// delay(100);
+// client.publish( "estacion_PM/pm10_sds021",dtostrf(Pm10_sds021,1,2,buf ));
+// delay(100);
+// client.publish( "estacion_PM/pm25_ppd42",dtostrf(Pm25_ppd42,1,2,buf ));
+// delay(100);
+// client.publish( "estacion_PM/windir",dtostrf(winddir,1,0,buf ));
+// delay(100);
+// client.publish( "estacion_PM/winspeed",dtostrf(windspeedmph,1,2,buf ));
+// delay(100);
+// client.publish( "estacion_PM/humedadHTU",dtostrf(humidity,1,2,buf ));
+// delay(100);
+// client.publish( "estacion_PM/tempHTU",dtostrf(tempHTU,1,2,buf ));
+// delay(100);
+// client.publish( "estacion_PM/pressure",dtostrf(pressure,1,0,buf ));
+// delay(100);
+// client.publish( "estacion_PM/light",dtostrf(light_lvl,1,2,buf ));
  
  /*
 String payload2 = "{";
