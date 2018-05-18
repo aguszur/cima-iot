@@ -12,7 +12,7 @@
 
 
 #define DHTTYPE DHT22
-#define WIFI_AP "Giulianis"
+#define WIFI_AP "Giuliani"
 #define WIFI_PASSWORD "benitomiguelete"
 //#define WIFI_AP "WLAN-11g-GW" //cima
 //#define WIFI_PASSWORD "W99r1ts78"
