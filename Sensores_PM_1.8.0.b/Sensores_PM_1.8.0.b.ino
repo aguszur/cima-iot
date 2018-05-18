@@ -12,8 +12,8 @@
 
 
 #define DHTTYPE DHT22
-#define WIFI_AP "APLinti2"
-#define WIFI_PASSWORD "bienvenidoalintigli"
+#define WIFI_AP "Giuliani"
+#define WIFI_PASSWORD "benitomiguelete"
 #define WIFI_AP_BK "motogbk"
 #define WIFI_PASSWORD_BK "12345678"
 #define VERSION "v1.8.0"
@@ -81,7 +81,7 @@ volatile float rainHour[60]; //60 floating numbers to keep track of 60 minutes o
 
 //Variables PPD42
 int PM=10;
-unsigned long sampletime_ms = 20000;//Leer datos durante x milisegundos
+unsigned long sampletime_ms = 10000;//Leer datos durante x milisegundos
 unsigned long duration;
 unsigned long starttime;
 unsigned long endtime;
