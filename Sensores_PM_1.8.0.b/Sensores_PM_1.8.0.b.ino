@@ -711,19 +711,7 @@ void printWeather()
     
   //Preparando JSON 
   
- /* EJEMPLO THINSGBOARD
-  *  String payload1 = "{";
-  payload1 += "\"temperatura1\":"; payload1 += String(tempf); payload1 += ",";
- payload1 += "\"humedad\":"; payload1 += String(humidity); payload1 += ",";
- payload1 += "\"presion\":"; payload1 += String(pressure); payload1 += ",";
- payload1 += "\"lluvia\":"; payload1+= String(light_lvl);
-  payload1 += "}";
-  
-  //Enviando DATOS 
-  char attributes[100];
- payload1.toCharArray( attributes, 100 );
- client.publish( "v1/devices/me/attributes", attributes );
- */
+ 
 
   
   //Imprimo LCD:  COLUMNA - FILA
