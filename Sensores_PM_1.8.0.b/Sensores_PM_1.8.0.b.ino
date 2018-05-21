@@ -109,7 +109,7 @@ float pressure = 0;
 float light_lvl = 0; //[analog value from 0 to 1023]
 
 // volatiles are subject to modification by IRQs
-volatile unsigned long raintime, rainlast, raininterval, rain;
+volatile unsigned long raintime, rainlast, raininterval, rain; //quitar
 
 
 
