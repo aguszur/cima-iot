@@ -793,13 +793,4 @@ void printWeather()
 // client.publish( "estacion_PM/light",dtostrf(light_lvl,1,2,buf ));
  
  
-String payload2 = "{";
-      payload2 += "\"temperatura\":"; payload2 += tempDHT; payload2 += ",";
-      payload2 += "\"humedad\":"; payload2 += humedadDHT;
-      payload2 += "}";
-      char attributes2[100];
-      payload2.toCharArray( attributes2, 100 );
-      client.publish( "estacion_PM", attributes2 );
- 
- 
 }
